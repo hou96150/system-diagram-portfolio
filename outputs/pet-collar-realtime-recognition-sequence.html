@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>寵物項圈即時辨識時序圖</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='14' fill='%23b85450'/%3E%3C/svg%3E">
+  <style>
+    *{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#eee9df;color:#282722;font-family:Geist,"Noto Sans TC",sans-serif}
+    body{display:grid;place-items:center;padding:24px}.sheet{width:min(1280px,calc(100vw - 48px),calc((100vh - 48px)*16/9));aspect-ratio:16/9;background:#f7f3ea;border:1px solid #cfc6b6;box-shadow:0 18px 50px rgba(50,43,32,.13);overflow:hidden}
+    svg{display:block;width:100%;height:100%}.title{font-family:Fraunces,serif;font-size:38px;font-weight:700;fill:#282722}.kicker{font-size:12px;font-weight:700;letter-spacing:2.4px;fill:#b85450}.subtitle{font-size:15px;fill:#6d665b}.actor{fill:#fffdf8;stroke:#80786b;stroke-width:1.4}.actor-accent{fill:#fbefeb;stroke:#b85450;stroke-width:2}.actor-title{font-size:14px;font-weight:700;fill:#282722}.actor-sub{font-size:10px;fill:#756e62}.life{stroke:#aaa193;stroke-width:1;stroke-dasharray:5 6}.activation{fill:#eee6d8;stroke:#80786b;stroke-width:1}.msg{stroke:#555149;stroke-width:1.5;fill:none}.msg-accent{stroke:#b85450;stroke-width:2;fill:none}.return{stroke-dasharray:6 5}.async{stroke:#477c74;stroke-width:1.7;fill:none}.label{font-size:11px;font-weight:600;fill:#3d3a34}.label-accent{font-size:11px;font-weight:700;fill:#a44743}.note{fill:#fff8e8;stroke:#c7a960;stroke-width:1}.note-text{font-size:10px;fill:#554c3b}.frame{fill:#b8545008;stroke:#b85450;stroke-width:1.2}.frame-tag{fill:#b85450}.frame-tag-text{font-size:9px;font-weight:700;fill:#fff}.legend{font-size:10px;fill:#6d665b}.small{font-size:9px;fill:#7e766a}
+  </style>
+</head>
+<body>
+<main class="sheet" aria-label="寵物項圈即時辨識時序圖">
+<svg viewBox="0 0 1280 720" role="img" aria-labelledby="realtime-title realtime-desc">
+<title id="realtime-title">寵物項圈即時辨識時序圖</title><desc id="realtime-desc">從麥克風收音、Python 邊緣監控、模型推論、後端風險判定，到手機即時更新與高風險蜂鳴器告警的時序。</desc>
+<defs>
+ <pattern id="dots" width="24" height="24" patternUnits="userSpaceOnUse"><circle cx="12" cy="12" r=".8" fill="#282722" opacity=".08"/></pattern>
+ <marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#555149"/></marker>
+ <marker id="arrAccent" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0L8 4L0 8Z" fill="#b85450"/></marker>
+ <marker id="arrOpen" markerWidth="9" markerHeight="9" refX="8" refY="4.5" orient="auto"><path d="M0 0L8 4.5L0 9" fill="none" stroke="#477c74" stroke-width="1.5"/></marker>
+</defs>
+<rect width="1280" height="720" fill="#f7f3ea"/><rect width="1280" height="720" fill="url(#dots)"/>
+<text x="54" y="48" class="kicker">SMART PET COLLAR · RUNTIME</text>
+<text x="54" y="92" class="title">寵物項圈即時辨識時序</text>
+<text x="54" y="119" class="subtitle">音訊由邊緣端判讀；後端回傳的 riskLevel 才是告警與畫面採用的權威結果。</text>
+
+<!-- Actors -->
+<g><rect x="56" y="146" width="176" height="58" rx="8" class="actor"/><text x="144" y="171" text-anchor="middle" class="actor-title">USB 麥克風</text><text x="144" y="188" text-anchor="middle" class="actor-sub">16 kHz 音訊串流</text></g>
+<g><rect x="286" y="146" width="176" height="58" rx="8" class="actor-accent"/><text x="374" y="171" text-anchor="middle" class="actor-title">Python 即時監控</text><text x="374" y="188" text-anchor="middle" class="actor-sub">LiveMonitor</text></g>
+<g><rect x="516" y="146" width="176" height="58" rx="8" class="actor"/><text x="604" y="171" text-anchor="middle" class="actor-title">邊緣 AI 模型</text><text x="604" y="188" text-anchor="middle" class="actor-sub">Dog Gate ＋ 情緒 CNN</text></g>
+<g><rect x="746" y="146" width="176" height="58" rx="8" class="actor"/><text x="834" y="171" text-anchor="middle" class="actor-title">Node.js 後端</text><text x="834" y="188" text-anchor="middle" class="actor-sub">驗證 · 計算 · 儲存</text></g>
+<g><rect x="976" y="146" width="176" height="58" rx="8" class="actor"/><text x="1064" y="171" text-anchor="middle" class="actor-title">手機監控頁</text><text x="1064" y="188" text-anchor="middle" class="actor-sub">SSE 即時事件</text></g>
+<path d="M144 204V638M374 204V638M604 204V638M834 204V638M1064 204V638" class="life"/>
+<rect x="368" y="224" width="12" height="392" rx="3" class="activation"/><rect x="598" y="316" width="12" height="66" rx="3" class="activation"/><rect x="828" y="416" width="12" height="122" rx="3" class="activation"/><rect x="1058" y="520" width="12" height="98" rx="3" class="activation"/>
+
+<!-- Messages -->
+<path d="M144 240H366" class="msg" marker-end="url(#arr)"/><text x="255" y="232" text-anchor="middle" class="label">① 音訊區塊 callback</text>
+<path d="M380 276H430V300H382" class="msg" marker-end="url(#arr)"/><text x="435" y="278" class="label">② RMS 門檻 ＋ 300 ms pre-roll</text>
+<path d="M380 328H596" class="msg" marker-end="url(#arr)"/><text x="488" y="320" text-anchor="middle" class="label">③ 擷取最新 2 秒 · 重疊視窗</text>
+<path d="M598 372H382" class="msg return" marker-end="url(#arr)"/><text x="490" y="364" text-anchor="middle" class="label">④ gate · arousal · valence · votes</text>
+<path d="M380 424H826" class="msg" marker-end="url(#arr)"/><text x="603" y="416" text-anchor="middle" class="label">⑤ POST /api/events ＋ clientEventId</text>
+<path d="M840 448H892V476H842" class="msg" marker-end="url(#arr)"/><text x="899" y="452" class="label">⑥ validate · calculateV2Risk · persist</text>
+<path d="M828 512H382" class="msg-accent return" marker-end="url(#arrAccent)"/><text x="605" y="503" text-anchor="middle" class="label-accent">⑦ authoritative riskLevel</text>
+<path d="M840 536H1056" class="async" marker-end="url(#arrOpen)"/><text x="948" y="528" text-anchor="middle" class="label">⑧ SSE recognition ＋ device status</text>
+
+<!-- High-risk fragment -->
+<rect x="320" y="554" width="800" height="76" rx="6" class="frame"/><path d="M320 554H392V574H320Z" class="frame-tag"/><text x="356" y="568" text-anchor="middle" class="frame-tag-text">OPT · risk = high</text>
+<path d="M380 588H430V610H382" class="msg-accent" marker-end="url(#arrAccent)"/><text x="440" y="593" class="label-accent">首次轉為 high → 蜂鳴器</text>
+<path d="M1070 588H1102V610H1072" class="msg-accent" marker-end="url(#arrAccent)"/><text x="1050" y="610" text-anchor="end" class="label-accent">警示卡與脈衝效果</text>
+
+<g transform="translate(54 660)"><line x1="0" y1="0" x2="42" y2="0" class="msg" marker-end="url(#arr)"/><text x="52" y="4" class="legend">同步呼叫</text><line x1="150" y1="0" x2="192" y2="0" class="msg return" marker-end="url(#arr)"/><text x="202" y="4" class="legend">回傳</text><line x1="286" y1="0" x2="328" y2="0" class="async" marker-end="url(#arrOpen)"/><text x="338" y="4" class="legend">非同步推送</text></g>
+<text x="1226" y="682" text-anchor="end" class="small">整合軟體流程；樹莓派蜂鳴器與實機耐候仍待硬體驗證</text>
+</svg>
+</main>
+</body>
+</html>

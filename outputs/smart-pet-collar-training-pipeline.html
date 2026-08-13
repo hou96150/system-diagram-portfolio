@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>智慧寵物項圈模型訓練流程</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23c64f35'/%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #faf6f3;
+      --surface: #fffdfb;
+      --ink: #2d2826;
+      --muted: #6f6662;
+      --soft: #928783;
+      --rule: #d2c7c1;
+      --accent: #c64f35;
+      --accent-tint: #f7dfd7;
+      --quality: #5a7d9a;
+      --release: #71814d;
+      --file: #9c6b50;
+      --dataset: #5e7a9b;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--paper); }
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--ink);
+      font-family: "Geist", "Noto Sans TC", ui-sans-serif, sans-serif;
+    }
+    main { width: min(100%, 1360px, calc((100vh - 48px) * 16 / 9)); }
+    figure { margin: 0; }
+    svg { display: block; width: 100%; height: auto; background: var(--paper); }
+    .title { font-family: "Fraunces", "Noto Serif TC", ui-serif, serif; }
+    .sans { font-family: "Geist", "Noto Sans TC", ui-sans-serif, sans-serif; }
+    .mono { font-family: "Geist Mono", "Noto Sans Mono CJK TC", monospace; }
+    .node-name { font-size: 16px; font-weight: 600; fill: var(--ink); }
+    .node-sub { font-size: 12px; fill: var(--muted); }
+    .node-tool { font-size: 8px; fill: var(--soft); }
+    .tag { font-size: 8px; font-weight: 600; letter-spacing: .12em; }
+    .stage { font-size: 8px; font-weight: 600; letter-spacing: .12em; }
+    .lane { font-size: 8px; font-weight: 600; letter-spacing: .16em; }
+    .legend { font-size: 12px; fill: var(--muted); }
+    .note { font-size: 12px; fill: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <figure>
+      <svg viewBox="0 0 1280 720" role="img" aria-labelledby="smart-pet-training-title smart-pet-training-desc">
+        <title id="smart-pet-training-title">智慧寵物項圈模型訓練流程</title>
+        <desc id="smart-pet-training-desc">授權音訊先建立可追溯 manifest 並檢查資料切分，再轉成 log-Mel 特徵；情緒雙輸出 CNN 與 dog／non-dog 閘門分開訓練及正規化，通過保留測試、外部驗證與閾值校正後，才轉換成 LiteRT INT8 模型與部署中繼資料。</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#6f6662"/>
+          </marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#c64f35"/>
+          </marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#355f83"/>
+          </marker>
+        </defs>
+
+        <rect width="1280" height="720" fill="var(--paper)"/>
+        <text x="40" y="28" class="mono" font-size="8" font-weight="600" letter-spacing=".18em" fill="var(--accent)">SMART PET COLLAR · REPRODUCIBLE TRAINING FLOW</text>
+        <text x="40" y="68" class="title" font-size="40" fill="var(--ink)">模型訓練流程架構</text>
+        <text x="40" y="96" class="sans" font-size="16" fill="var(--muted)">兩條模型分支、同一套資料治理：來源可追溯、切分不洩漏、測試集不參與訓練</text>
+
+        <!-- Stage headers -->
+        <g class="mono stage" text-anchor="middle" fill="var(--muted)">
+          <rect x="116" y="116" width="24" height="16" rx="8" fill="rgba(45,40,38,.10)"/>
+          <text x="128" y="128" fill="var(--ink)">1</text>
+          <text x="128" y="148">SOURCE</text>
+
+          <rect x="316" y="116" width="24" height="16" rx="8" fill="rgba(45,40,38,.10)"/>
+          <text x="328" y="128" fill="var(--ink)">2</text>
+          <text x="328" y="148">GOVERN</text>
+
+          <rect x="516" y="116" width="24" height="16" rx="8" fill="rgba(45,40,38,.10)"/>
+          <text x="528" y="128" fill="var(--ink)">3</text>
+          <text x="528" y="148">FEATURE</text>
+
+          <rect x="716" y="116" width="24" height="16" rx="8" fill="rgba(45,40,38,.10)"/>
+          <text x="728" y="128" fill="var(--ink)">4</text>
+          <text x="728" y="148">TRAIN</text>
+
+          <rect x="916" y="116" width="24" height="16" rx="8" fill="rgba(198,79,53,.18)"/>
+          <text x="928" y="128" fill="var(--accent)">5</text>
+          <text x="928" y="148" fill="var(--accent)">VALIDATE</text>
+
+          <rect x="1128" y="116" width="24" height="16" rx="8" fill="rgba(45,40,38,.10)"/>
+          <text x="1140" y="128" fill="var(--ink)">6</text>
+          <text x="1140" y="148">RELEASE</text>
+        </g>
+
+        <!-- Lane bands -->
+        <rect x="40" y="168" width="1200" height="104" rx="8" fill="rgba(45,40,38,.018)" stroke="rgba(45,40,38,.10)" stroke-width=".8"/>
+        <rect x="52" y="160" width="112" height="16" rx="2" fill="var(--paper)"/>
+        <text x="108" y="172" class="mono lane" text-anchor="middle" fill="var(--muted)">情緒模型路徑</text>
+
+        <rect x="40" y="284" width="1200" height="96" rx="8" fill="rgba(90,125,154,.035)" stroke="rgba(90,125,154,.18)" stroke-width=".8"/>
+        <rect x="52" y="276" width="112" height="16" rx="2" fill="var(--paper)"/>
+        <text x="108" y="288" class="mono lane" text-anchor="middle" fill="var(--quality)">共用資料治理</text>
+
+        <rect x="40" y="392" width="1200" height="104" rx="8" fill="rgba(45,40,38,.018)" stroke="rgba(45,40,38,.10)" stroke-width=".8"/>
+        <rect x="52" y="384" width="112" height="16" rx="2" fill="var(--paper)"/>
+        <text x="108" y="396" class="mono lane" text-anchor="middle" fill="var(--muted)">犬聲閘門路徑</text>
+
+        <!-- Connectors before nodes -->
+        <path d="M 208,224 H 320 Q 328,224 328,232 V 292" fill="none" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M 208,440 H 320 Q 328,440 328,432 V 372" fill="none" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="408" y1="332" x2="448" y2="332" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M 608,316 H 720 Q 728,316 728,308 V 264" fill="none" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M 608,348 H 720 Q 728,348 728,356 V 400" fill="none" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <path d="M 808,224 H 920 Q 928,224 928,232 V 292" fill="none" stroke="var(--accent)" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+        <path d="M 808,440 H 920 Q 928,440 928,432 V 372" fill="none" stroke="var(--accent)" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+        <path d="M 1008,332 H 1120 Q 1128,332 1128,324 V 264" fill="none" stroke="var(--accent)" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+        <line x1="1176" y1="264" x2="1176" y2="400" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <!-- Nodes -->
+        <g>
+          <rect x="48" y="184" width="160" height="80" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="60" y="192" width="56" height="16" rx="2" fill="rgba(94,122,155,.12)" stroke="var(--dataset)" stroke-width=".8"/>
+          <text x="88" y="204" class="mono tag" text-anchor="middle" fill="var(--dataset)">DATASET</text>
+          <text x="128" y="228" class="sans node-name" text-anchor="middle">EmotionalCanines</text>
+          <text x="128" y="248" class="mono node-sub" text-anchor="middle">1,400 WAV · dog-disjoint</text>
+          <text x="128" y="260" class="mono node-tool" text-anchor="middle">arousal · valence</text>
+        </g>
+
+        <g>
+          <rect x="48" y="400" width="160" height="80" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="60" y="408" width="56" height="16" rx="2" fill="rgba(94,122,155,.12)" stroke="var(--dataset)" stroke-width=".8"/>
+          <text x="88" y="420" class="mono tag" text-anchor="middle" fill="var(--dataset)">DATASET</text>
+          <text x="128" y="444" class="sans node-name" text-anchor="middle">ESC-50 環境聲</text>
+          <text x="128" y="464" class="mono node-sub" text-anchor="middle">fold 1–3 / 4 / 5</text>
+          <text x="128" y="476" class="mono node-tool" text-anchor="middle">dog class → external only</text>
+        </g>
+
+        <g>
+          <rect x="248" y="292" width="160" height="80" rx="8" fill="rgba(90,125,154,.06)" stroke="var(--quality)" stroke-width="1"/>
+          <rect x="260" y="300" width="48" height="16" rx="2" fill="rgba(90,125,154,.14)" stroke="var(--quality)" stroke-width=".8"/>
+          <text x="284" y="312" class="mono tag" text-anchor="middle" fill="var(--quality)">GUARD</text>
+          <text x="328" y="336" class="sans node-name" text-anchor="middle">Manifest 與切分檢查</text>
+          <text x="328" y="356" class="mono node-sub" text-anchor="middle">source · SHA-256 · split</text>
+          <text x="328" y="368" class="mono node-tool" text-anchor="middle">verify_split_integrity.py</text>
+        </g>
+
+        <g>
+          <rect x="448" y="292" width="160" height="80" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="460" y="300" width="56" height="16" rx="2" fill="transparent" stroke="rgba(45,40,38,.4)" stroke-width=".8"/>
+          <text x="488" y="312" class="mono tag" text-anchor="middle" fill="var(--muted)">FEATURE</text>
+          <text x="528" y="336" class="sans node-name" text-anchor="middle">共用 log-Mel 特徵</text>
+          <text x="528" y="356" class="mono node-sub" text-anchor="middle">16 kHz · 1 s · 64×97×1</text>
+          <text x="528" y="368" class="mono node-tool" text-anchor="middle">compressed NPZ cache</text>
+        </g>
+
+        <g>
+          <rect x="648" y="184" width="160" height="80" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="660" y="192" width="48" height="16" rx="2" fill="transparent" stroke="rgba(45,40,38,.4)" stroke-width=".8"/>
+          <text x="684" y="204" class="mono tag" text-anchor="middle" fill="var(--muted)">TRAIN</text>
+          <text x="728" y="228" class="sans node-name" text-anchor="middle">雙輸出情緒 CNN</text>
+          <text x="728" y="248" class="mono node-sub" text-anchor="middle">global train normalization</text>
+          <text x="728" y="260" class="mono node-tool" text-anchor="middle">arousal head · valence head</text>
+        </g>
+
+        <g>
+          <rect x="648" y="400" width="160" height="80" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="660" y="408" width="48" height="16" rx="2" fill="transparent" stroke="rgba(45,40,38,.4)" stroke-width=".8"/>
+          <text x="684" y="420" class="mono tag" text-anchor="middle" fill="var(--muted)">TRAIN</text>
+          <text x="728" y="444" class="sans node-name" text-anchor="middle">dog／non-dog 閘門</text>
+          <text x="728" y="464" class="mono node-sub" text-anchor="middle">per-window z-score</text>
+          <text x="728" y="476" class="mono node-tool" text-anchor="middle">binary gate · class weights</text>
+        </g>
+
+        <g>
+          <rect x="848" y="292" width="160" height="80" rx="8" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.2"/>
+          <rect x="860" y="300" width="40" height="16" rx="2" fill="rgba(198,79,53,.12)" stroke="var(--accent)" stroke-width=".8"/>
+          <text x="880" y="312" class="mono tag" text-anchor="middle" fill="var(--accent)">GATE</text>
+          <text x="928" y="336" class="sans node-name" text-anchor="middle">保留集品質關卡</text>
+          <text x="928" y="356" class="mono node-sub" text-anchor="middle">test metrics · external eval</text>
+          <text x="928" y="368" class="mono node-tool" text-anchor="middle">threshold calibration · reports</text>
+        </g>
+
+        <g>
+          <rect x="1048" y="184" width="184" height="80" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="1060" y="192" width="64" height="16" rx="2" fill="transparent" stroke="rgba(45,40,38,.4)" stroke-width=".8"/>
+          <text x="1092" y="204" class="mono tag" text-anchor="middle" fill="var(--muted)">CONVERT</text>
+          <text x="1140" y="228" class="sans node-name" text-anchor="middle">LiteRT／TFLite 轉換</text>
+          <text x="1140" y="248" class="mono node-sub" text-anchor="middle">float32 + full INT8</text>
+          <text x="1140" y="260" class="mono node-tool" text-anchor="middle">representative data = train only</text>
+        </g>
+
+        <g>
+          <rect x="1048" y="400" width="184" height="80" rx="8" fill="rgba(113,129,77,.07)" stroke="var(--release)" stroke-width="1"/>
+          <rect x="1060" y="408" width="56" height="16" rx="2" fill="rgba(113,129,77,.14)" stroke="var(--release)" stroke-width=".8"/>
+          <text x="1088" y="420" class="mono tag" text-anchor="middle" fill="var(--release)">BUNDLE</text>
+          <text x="1140" y="444" class="sans node-name" text-anchor="middle">邊緣部署產物</text>
+          <text x="1140" y="464" class="mono node-sub" text-anchor="middle">2× INT8 models + metadata</text>
+          <text x="1140" y="476" class="mono node-tool" text-anchor="middle">labels · normalization · threshold</text>
+        </g>
+
+        <text x="48" y="536" class="sans note">情緒模型：官方 dog-disjoint train／validation／test；正規化統計只由 train split 計算。</text>
+        <text x="48" y="560" class="sans note">犬聲閘門：ESC-50 dog 類不參與訓練或閾值校正，只用來檢查外部犬聲泛化。</text>
+        <text x="48" y="584" class="sans note" fill="var(--accent)">品質界線：目前模型是研究基準；保留集評估不等於安全認證或攻擊行為判定。</text>
+
+        <!-- Legend strip -->
+        <line x1="40" y1="620" x2="1240" y2="620" stroke="rgba(45,40,38,.14)" stroke-width=".8"/>
+        <text x="40" y="648" class="mono lane" fill="var(--muted)">LEGEND</text>
+        <rect x="132" y="636" width="20" height="16" rx="4" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1"/>
+        <text x="164" y="648" class="sans legend">必要品質關卡</text>
+        <rect x="328" y="636" width="20" height="16" rx="4" fill="rgba(90,125,154,.06)" stroke="var(--quality)" stroke-width="1"/>
+        <text x="360" y="648" class="sans legend">資料治理／洩漏防線</text>
+        <rect x="584" y="636" width="20" height="16" rx="4" fill="rgba(113,129,77,.07)" stroke="var(--release)" stroke-width="1"/>
+        <text x="616" y="648" class="sans legend">可部署產物</text>
+        <rect x="776" y="636" width="24" height="12" rx="2" fill="var(--dataset)"/>
+        <text x="812" y="648" class="sans legend">DB＝資料集</text>
+        <rect x="936" y="636" width="24" height="12" rx="2" fill="var(--file)"/>
+        <text x="972" y="648" class="sans legend">FL＝模型／報告檔</text>
+
+        <text x="40" y="704" class="mono" font-size="8" fill="var(--soft)">SOURCE · training scripts + TRAINING_LOG.md · status 2026-07-18</text>
+        <text x="1240" y="704" class="mono" font-size="8" text-anchor="end" fill="var(--soft)">PROCESS · SLIDE 16:9 · STATIC</text>
+      </svg>
+    </figure>
+  </main>
+</body>
+</html>

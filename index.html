@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="侯旭昇的系統架構圖作品集：寵物智慧項圈、TOEIC AI Learning System 與 Spectrum Detective。">
+  <title>System Diagram Portfolio｜系統架構圖作品集</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='6' fill='%23ad4f49'/%3E%3Cpath d='M9 11h14M9 16h9M9 21h14' stroke='white' stroke-width='2'/%3E%3C/svg%3E">
+  <style>
+    :root{color-scheme:light;--paper:#f3efe6;--ink:#24231f;--muted:#6e685e;--line:#cfc6b6;--card:#fffdf8;--accent:#ad4f49}
+    *{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Segoe UI","Microsoft JhengHei",sans-serif}header,main,footer{width:min(1160px,calc(100% - 40px));margin:auto}header{padding:72px 0 34px;border-bottom:1px solid var(--line)}.eyebrow{margin:0 0 12px;color:var(--accent);font-size:12px;font-weight:800;letter-spacing:.18em}.title{margin:0;font-family:Georgia,"Microsoft JhengHei",serif;font-size:clamp(36px,6vw,68px);line-height:1}.intro{max-width:720px;margin:18px 0 0;color:var(--muted);font-size:17px;line-height:1.75}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;padding:36px 0 52px}.card{overflow:hidden;border:1px solid var(--line);border-radius:10px;background:var(--card)}.preview{position:relative;aspect-ratio:16/9;overflow:hidden;background:#ddd;border-bottom:1px solid var(--line)}iframe{width:1280px;height:720px;border:0;transform:scale(var(--scale));transform-origin:top left;pointer-events:none}.copy{padding:20px}.tag{margin:0 0 8px;color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.12em}.copy h2{margin:0;font-size:21px}.copy p{min-height:48px;margin:9px 0 18px;color:var(--muted);line-height:1.55}.open{display:inline-block;color:var(--ink);font-weight:700;text-underline-offset:4px}footer{padding:24px 0 44px;border-top:1px solid var(--line);color:var(--muted);font-size:13px}@media(max-width:760px){header{padding-top:44px}.grid{grid-template-columns:1fr}.copy p{min-height:0}}
+  </style>
+</head>
+<body>
+  <header><p class="eyebrow">HOU HSU-SHENG · VERIFIED VISUAL WORK</p><h1 class="title">系統架構圖作品集</h1><p class="intro">用可驗證的資料流說明系統：哪些已實作、哪些是權威判定、哪些仍是硬體或真實資料待驗證範圍。</p></header>
+  <main class="grid">
+    <article class="card"><div class="preview"><iframe title="寵物智慧項圈系統架構圖預覽" src="outputs/smart-pet-collar-system-architecture.html"></iframe></div><div class="copy"><p class="tag">SMART PET COLLAR</p><h2>系統架構圖</h2><p>從項圈邊緣 AI、事件後端到手機即時監控。</p><a class="open" href="outputs/smart-pet-collar-system-architecture.html">開啟完整圖 ↗</a></div></article>
+    <article class="card"><div class="preview"><iframe title="寵物智慧項圈訓練管線預覽" src="outputs/smart-pet-collar-training-pipeline.html"></iframe></div><div class="copy"><p class="tag">SMART PET COLLAR</p><h2>模型訓練管線</h2><p>資料切分、特徵、雙頭模型與部署產物的完整路徑。</p><a class="open" href="outputs/smart-pet-collar-training-pipeline.html">開啟完整圖 ↗</a></div></article>
+    <article class="card"><div class="preview"><iframe title="寵物項圈即時辨識時序圖預覽" src="outputs/pet-collar-realtime-recognition-sequence.html"></iframe></div><div class="copy"><p class="tag">SMART PET COLLAR</p><h2>即時辨識時序圖</h2><p>收音、邊緣推論、後端權威風險與 SSE 更新。</p><a class="open" href="outputs/pet-collar-realtime-recognition-sequence.html">開啟完整圖 ↗</a></div></article>
+    <article class="card"><div class="preview"><iframe title="寵物項圈離線補送流程圖預覽" src="outputs/pet-collar-offline-resend-flow.html"></iframe></div><div class="copy"><p class="tag">SMART PET COLLAR</p><h2>離線補送流程圖</h2><p>FIFO、成功 ACK 後刪除，以及 clientEventId 冪等去重。</p><a class="open" href="outputs/pet-collar-offline-resend-flow.html">開啟完整圖 ↗</a></div></article>
+    <article class="card"><div class="preview"><iframe title="TOEIC 單字資料生命週期預覽" src="outputs/toeic-vocabulary-data-lifecycle.html"></iframe></div><div class="copy"><p class="tag">TOEIC AI LEARNING SYSTEM</p><h2>單字資料生命週期</h2><p>從 Drive／OCR 到 pending 審核與 approved 正式字卡。</p><a class="open" href="outputs/toeic-vocabulary-data-lifecycle.html">開啟完整圖 ↗</a></div></article>
+    <article class="card"><div class="preview"><iframe title="Spectrum Detective 訊號分析圖預覽" src="outputs/spectrum-detective-signal-analysis.html"></iframe></div><div class="copy"><p class="tag">SPECTRUM DETECTIVE</p><h2>訊號分析學習管線</h2><p>合成 RF frame、頻譜／瀑布判讀、證據計分與報告。</p><a class="open" href="outputs/spectrum-detective-signal-analysis.html">開啟完整圖 ↗</a></div></article>
+  </main>
+  <footer>所有圖表皆為可離線開啟的自包含 HTML。內容以專案實作為準，限制不隱藏。</footer>
+  <script>const resize=()=>document.querySelectorAll('.preview').forEach(box=>box.style.setProperty('--scale',box.clientWidth/1280));resize();addEventListener('resize',resize);</script>
+</body>
+</html>

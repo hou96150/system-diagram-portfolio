@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>智慧寵物項圈系統架構</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='6' fill='%23c64f35'/%3E%3C/svg%3E">
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --paper: #faf6f3;
+      --paper-2: #f4ece8;
+      --surface: #fffdfb;
+      --ink: #2d2826;
+      --muted: #6f6662;
+      --soft: #928783;
+      --rule: #d2c7c1;
+      --accent: #c64f35;
+      --accent-tint: #f7dfd7;
+      --link: #355f83;
+      --success: #55765f;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--paper); }
+    body {
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      color: var(--ink);
+      font-family: "Geist", "Noto Sans TC", ui-sans-serif, sans-serif;
+    }
+    main { width: min(100%, 1360px, calc((100vh - 48px) * 16 / 9)); }
+    figure { margin: 0; }
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: var(--paper);
+    }
+    .title { font-family: "Fraunces", "Noto Serif TC", ui-serif, serif; }
+    .sans { font-family: "Geist", "Noto Sans TC", ui-sans-serif, sans-serif; }
+    .mono { font-family: "Geist Mono", "Noto Sans Mono CJK TC", monospace; }
+    .node-name { font-size: 16px; font-weight: 600; fill: var(--ink); }
+    .node-sub { font-size: 12px; fill: var(--muted); }
+    .tag { font-size: 8px; font-weight: 600; letter-spacing: .12em; }
+    .edge-label { font-size: 12px; font-weight: 500; letter-spacing: .06em; }
+    .zone-label { font-size: 8px; font-weight: 600; letter-spacing: .16em; }
+    .legend { font-size: 12px; fill: var(--muted); }
+    .note { font-size: 12px; fill: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <figure>
+      <svg viewBox="0 0 1280 720" role="img" aria-labelledby="smart-pet-collar-architecture-title smart-pet-collar-architecture-desc">
+        <title id="smart-pet-collar-architecture-title">智慧寵物項圈系統架構</title>
+        <desc id="smart-pet-collar-architecture-desc">USB 麥克風音訊在項圈端經收音、犬聲閘門與雙輸出模型分析，事件送往 Node.js 後端統一判斷風險、持久保存並透過 SSE 更新手機監控介面；離線事件由 SQLite 佇列補送，高風險回覆才會觸發蜂鳴器。</desc>
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#6f6662"/>
+          </marker>
+          <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#c64f35"/>
+          </marker>
+          <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+            <polygon points="0 0, 8 3, 0 6" fill="#355f83"/>
+          </marker>
+        </defs>
+
+        <rect width="1280" height="720" fill="var(--paper)"/>
+
+        <text x="40" y="28" class="mono" font-size="8" font-weight="600" letter-spacing=".18em" fill="var(--accent)">SMART PET COLLAR · VERIFIED SOFTWARE FLOW</text>
+        <text x="40" y="68" class="title" font-size="40" fill="var(--ink)">智慧寵物項圈系統架構</text>
+        <text x="40" y="96" class="sans" font-size="16" fill="var(--muted)">從犬聲收音、邊緣 AI 推論，到可追溯的風險事件與手機即時監控</text>
+
+        <!-- Zones: background → zones → arrows → nodes -->
+        <rect x="40" y="116" width="648" height="472" rx="8" fill="rgba(45,40,38,.018)" stroke="rgba(45,40,38,.14)" stroke-width=".8"/>
+        <rect x="52" y="120" width="112" height="16" rx="2" fill="var(--paper)"/>
+        <text x="108" y="132" class="mono zone-label" text-anchor="middle" fill="var(--muted)">項圈／邊緣裝置</text>
+
+        <rect x="720" y="116" width="264" height="472" rx="8" fill="rgba(45,40,38,.018)" stroke="rgba(45,40,38,.14)" stroke-width=".8"/>
+        <rect x="732" y="120" width="96" height="16" rx="2" fill="var(--paper)"/>
+        <text x="780" y="132" class="mono zone-label" text-anchor="middle" fill="var(--muted)">區域網路服務</text>
+
+        <rect x="1016" y="116" width="224" height="472" rx="8" fill="rgba(45,40,38,.018)" stroke="rgba(45,40,38,.14)" stroke-width=".8"/>
+        <rect x="1028" y="120" width="80" height="16" rx="2" fill="var(--paper)"/>
+        <text x="1068" y="132" class="mono zone-label" text-anchor="middle" fill="var(--muted)">飼主端</text>
+
+        <!-- Primary and supporting connectors. All arrows precede nodes. -->
+        <line x1="216" y1="216" x2="256" y2="216" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <line x1="424" y1="216" x2="464" y2="216" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+
+        <line x1="664" y1="192" x2="752" y2="192" stroke="var(--link)" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+        <rect x="680" y="164" width="56" height="16" rx="2" fill="var(--paper)"/>
+        <text x="708" y="176" class="mono edge-label" text-anchor="middle" fill="var(--link)">POST</text>
+
+        <line x1="752" y1="240" x2="664" y2="240" stroke="var(--accent)" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow-accent)"/>
+        <rect x="668" y="212" width="80" height="16" rx="2" fill="var(--paper)"/>
+        <text x="708" y="224" class="mono edge-label" text-anchor="middle" fill="var(--accent)">RISK</text>
+
+        <line x1="952" y1="216" x2="1040" y2="216" stroke="var(--link)" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+        <rect x="972" y="188" width="48" height="16" rx="2" fill="var(--paper)"/>
+        <text x="996" y="200" class="mono edge-label" text-anchor="middle" fill="var(--link)">SSE</text>
+
+        <line x1="600" y1="256" x2="600" y2="400" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <rect x="612" y="316" width="52" height="20" rx="2" fill="var(--paper)"/>
+        <text x="638" y="328" class="mono edge-label" text-anchor="middle" fill="var(--muted)">OFFLINE</text>
+
+        <path d="M 648,440 H 704 Q 712,440 712,432 V 224 Q 712,216 720,216 H 752" fill="none" stroke="var(--muted)" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+        <rect x="648" y="340" width="52" height="20" rx="2" fill="var(--paper)"/>
+        <text x="674" y="352" class="mono edge-label" text-anchor="middle" fill="var(--muted)">RETRY</text>
+
+        <line x1="856" y1="256" x2="856" y2="400" stroke="var(--muted)" stroke-width="1.2" marker-end="url(#arrow)"/>
+        <rect x="868" y="316" width="52" height="20" rx="2" fill="var(--paper)"/>
+        <text x="894" y="328" class="mono edge-label" text-anchor="middle" fill="var(--muted)">WRITE</text>
+
+        <path d="M 528,256 V 320 Q 528,328 520,328 H 348 Q 340,328 340,336 V 400" fill="none" stroke="var(--accent)" stroke-width="1.2" marker-end="url(#arrow-accent)"/>
+        <rect x="392" y="296" width="84" height="20" rx="2" fill="var(--paper)"/>
+        <text x="434" y="308" class="mono edge-label" text-anchor="middle" fill="var(--accent)">HIGH ONLY</text>
+
+        <!-- Nodes -->
+        <g>
+          <rect x="64" y="176" width="152" height="80" rx="8" fill="var(--paper)"/>
+          <rect x="64" y="176" width="152" height="80" rx="8" fill="rgba(45,40,38,.02)" stroke="var(--soft)" stroke-width="1" stroke-dasharray="4,4"/>
+          <rect x="76" y="184" width="64" height="16" rx="2" fill="transparent" stroke="var(--soft)" stroke-width=".8"/>
+          <text x="108" y="196" class="mono tag" text-anchor="middle" fill="var(--muted)">TARGET HW</text>
+          <text x="140" y="224" class="sans node-name" text-anchor="middle">USB 麥克風</text>
+          <text x="140" y="244" class="mono node-sub" text-anchor="middle">16 kHz · mono</text>
+        </g>
+
+        <g>
+          <rect x="256" y="176" width="168" height="80" rx="8" fill="var(--paper)"/>
+          <rect x="256" y="176" width="168" height="80" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/>
+          <rect x="268" y="184" width="64" height="16" rx="2" fill="transparent" stroke="rgba(45,40,38,.4)" stroke-width=".8"/>
+          <text x="300" y="196" class="mono tag" text-anchor="middle" fill="var(--muted)">PYTHON</text>
+          <text x="340" y="224" class="sans node-name" text-anchor="middle">即時收音器</text>
+          <text x="340" y="244" class="mono node-sub" text-anchor="middle">RMS · pre-roll · WAV</text>
+        </g>
+
+        <g>
+          <rect x="464" y="176" width="200" height="80" rx="8" fill="var(--paper)"/>
+          <rect x="464" y="176" width="200" height="80" rx="8" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.2"/>
+          <rect x="476" y="184" width="56" height="16" rx="2" fill="transparent" stroke="var(--accent)" stroke-width=".8"/>
+          <text x="504" y="196" class="mono tag" text-anchor="middle" fill="var(--accent)">EDGE AI</text>
+          <text x="564" y="224" class="sans node-name" text-anchor="middle">犬聲與情緒推論</text>
+          <text x="564" y="244" class="mono node-sub" text-anchor="middle">log-Mel · dog gate · INT8 CNN</text>
+        </g>
+
+        <g>
+          <rect x="256" y="400" width="168" height="80" rx="8" fill="var(--paper)"/>
+          <rect x="256" y="400" width="168" height="80" rx="8" fill="rgba(198,79,53,.04)" stroke="var(--accent)" stroke-width="1" stroke-dasharray="4,4"/>
+          <rect x="268" y="408" width="64" height="16" rx="2" fill="transparent" stroke="var(--accent)" stroke-width=".8"/>
+          <text x="300" y="420" class="mono tag" text-anchor="middle" fill="var(--accent)">TARGET HW</text>
+          <text x="340" y="448" class="sans node-name" text-anchor="middle">GPIO 蜂鳴器</text>
+          <text x="340" y="468" class="mono node-sub" text-anchor="middle">0.15 s · safe cleanup</text>
+        </g>
+
+        <g>
+          <rect x="480" y="400" width="168" height="80" rx="8" fill="var(--paper)"/>
+          <rect x="480" y="400" width="168" height="80" rx="8" fill="rgba(45,40,38,.05)" stroke="var(--muted)" stroke-width="1"/>
+          <rect x="492" y="408" width="48" height="16" rx="2" fill="transparent" stroke="var(--muted)" stroke-width=".8"/>
+          <text x="516" y="420" class="mono tag" text-anchor="middle" fill="var(--muted)">QUEUE</text>
+          <text x="564" y="448" class="sans node-name" text-anchor="middle">離線事件佇列</text>
+          <text x="564" y="468" class="mono node-sub" text-anchor="middle">SQLite FIFO · clientEventId</text>
+        </g>
+
+        <g>
+          <rect x="752" y="176" width="200" height="80" rx="8" fill="var(--paper)"/>
+          <rect x="752" y="176" width="200" height="80" rx="8" fill="var(--surface)" stroke="var(--ink)" stroke-width="1.2"/>
+          <rect x="764" y="184" width="48" height="16" rx="2" fill="transparent" stroke="rgba(45,40,38,.4)" stroke-width=".8"/>
+          <text x="788" y="196" class="mono tag" text-anchor="middle" fill="var(--muted)">API</text>
+          <text x="852" y="224" class="sans node-name" text-anchor="middle">Node.js 控制服務</text>
+          <text x="852" y="244" class="mono node-sub" text-anchor="middle">REST · risk · idempotency · SSE</text>
+        </g>
+
+        <g>
+          <rect x="752" y="400" width="200" height="80" rx="8" fill="var(--paper)"/>
+          <rect x="752" y="400" width="200" height="80" rx="8" fill="rgba(45,40,38,.05)" stroke="var(--muted)" stroke-width="1"/>
+          <rect x="764" y="408" width="48" height="16" rx="2" fill="transparent" stroke="var(--muted)" stroke-width=".8"/>
+          <text x="788" y="420" class="mono tag" text-anchor="middle" fill="var(--muted)">STORE</text>
+          <text x="852" y="448" class="sans node-name" text-anchor="middle">事件與裝置狀態</text>
+          <text x="852" y="468" class="mono node-sub" text-anchor="middle">JSONL · latest · rules · index</text>
+        </g>
+
+        <g>
+          <rect x="1040" y="176" width="176" height="80" rx="8" fill="var(--paper)"/>
+          <rect x="1040" y="176" width="176" height="80" rx="8" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1.2"/>
+          <rect x="1052" y="184" width="48" height="16" rx="2" fill="transparent" stroke="var(--accent)" stroke-width=".8"/>
+          <text x="1076" y="196" class="mono tag" text-anchor="middle" fill="var(--accent)">WEB</text>
+          <text x="1128" y="224" class="sans node-name" text-anchor="middle">手機即時監控</text>
+          <text x="1128" y="244" class="mono node-sub" text-anchor="middle">emotion · risk · device</text>
+        </g>
+
+        <text x="64" y="532" class="sans note">邊緣端：非犬聲輸出 unknown／low；高風險需 3 個視窗中至少 2 個為 high arousal + negative valence。</text>
+        <text x="64" y="556" class="sans note" fill="var(--accent)">硬體界線：Raspberry Pi、USB 麥克風與實體 GPIO 蜂鳴器仍待實機驗收。</text>
+        <text x="744" y="532" class="sans note">後端是風險判斷的唯一權威來源。</text>
+        <text x="744" y="556" class="sans note">目前只支援同一區域網路，尚未接雲端帳號或遠端通知。</text>
+
+        <!-- Legend strip -->
+        <line x1="40" y1="644" x2="1240" y2="644" stroke="rgba(45,40,38,.14)" stroke-width=".8"/>
+        <text x="40" y="672" class="mono zone-label" fill="var(--muted)">LEGEND</text>
+        <rect x="132" y="660" width="20" height="16" rx="4" fill="var(--accent-tint)" stroke="var(--accent)" stroke-width="1"/>
+        <text x="164" y="672" class="sans legend">核心決策／飼主焦點</text>
+        <rect x="336" y="660" width="20" height="16" rx="4" fill="var(--surface)" stroke="var(--ink)" stroke-width="1"/>
+        <text x="368" y="672" class="sans legend">已整合軟體元件</text>
+        <rect x="540" y="660" width="20" height="16" rx="4" fill="rgba(45,40,38,.02)" stroke="var(--soft)" stroke-width="1" stroke-dasharray="4,4"/>
+        <text x="572" y="672" class="sans legend">硬體介面，實機驗收待完成</text>
+        <line x1="812" y1="668" x2="844" y2="668" stroke="var(--link)" stroke-width="1.2" marker-end="url(#arrow-link)"/>
+        <text x="856" y="672" class="sans legend">HTTP／SSE</text>
+        <line x1="984" y1="668" x2="1016" y2="668" stroke="var(--muted)" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#arrow)"/>
+        <text x="1028" y="672" class="sans legend">回覆／補送</text>
+
+        <text x="40" y="704" class="mono" font-size="8" fill="var(--soft)">SOURCE · smart-pet-collar codebase · software status 2026-07-18</text>
+        <text x="1240" y="704" class="mono" font-size="8" text-anchor="end" fill="var(--soft)">ARCHITECTURE · SLIDE 16:9 · STATIC</text>
+      </svg>
+    </figure>
+  </main>
+</body>
+</html>
