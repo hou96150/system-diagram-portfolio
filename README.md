@@ -6,18 +6,18 @@
 
 ### Smart Pet Collar｜寵物智慧項圈
 
-- [系統架構圖](outputs/smart-pet-collar-system-architecture.html)：邊緣辨識、後端事件、即時監控與硬體邊界。
-- [模型訓練管線](outputs/smart-pet-collar-training-pipeline.html)：資料集、切分、特徵、模型與部署產物。
-- [即時辨識時序圖](outputs/pet-collar-realtime-recognition-sequence.html)：音訊收集、邊緣推論、後端權威風險與 SSE 更新。
-- [離線補送流程圖](outputs/pet-collar-offline-resend-flow.html)：SQLite FIFO、ACK 後刪除與 `clientEventId` 冪等去重。
+- [系統架構圖](https://hou96150.github.io/system-diagram-portfolio/outputs/smart-pet-collar-system-architecture.html)：邊緣辨識、後端事件、即時監控與硬體邊界。
+- [模型訓練管線](https://hou96150.github.io/system-diagram-portfolio/outputs/smart-pet-collar-training-pipeline.html)：資料集、切分、特徵、模型與部署產物。
+- [即時辨識時序圖](https://hou96150.github.io/system-diagram-portfolio/outputs/pet-collar-realtime-recognition-sequence.html)：音訊收集、邊緣推論、後端權威風險與 SSE 更新。
+- [離線補送流程圖](https://hou96150.github.io/system-diagram-portfolio/outputs/pet-collar-offline-resend-flow.html)：SQLite FIFO、ACK 後刪除與 `clientEventId` 冪等去重。
 
 ### TOEIC AI Learning System
 
-- [單字資料生命週期](outputs/toeic-vocabulary-data-lifecycle.html)：Drive／OCR 匯入、`pending` 人工審核閘門與 `approved` 正式字卡。
+- [單字資料生命週期](https://hou96150.github.io/system-diagram-portfolio/outputs/toeic-vocabulary-data-lifecycle.html)：Drive／OCR 匯入、`pending` 人工審核閘門與 `approved` 正式字卡。
 
 ### Spectrum Detective
 
-- [訊號分析學習管線](outputs/spectrum-detective-signal-analysis.html)：固定 seed 合成 RF frame、頻譜／瀑布判讀、證據計分與 Markdown 報告。
+- [訊號分析學習管線](https://hou96150.github.io/system-diagram-portfolio/outputs/spectrum-detective-signal-analysis.html)：固定 seed 合成 RF frame、頻譜／瀑布判讀、證據計分與 Markdown 報告。
 
 ## 驗證與誠實邊界
 
@@ -27,7 +27,7 @@
 - 寵物項圈的軟體整合流程已對照實作；樹莓派蜂鳴器與實機耐候仍屬硬體待驗證範圍。
 - TOEIC 的 OCR 匯入資料不會直接成為正式字卡，必須先經人工審核與明確核准。
 
-直接開啟 [作品集首頁](index.html)，或逐一下載 `outputs/` 內的 HTML。
+直接開啟 [作品集首頁](https://hou96150.github.io/system-diagram-portfolio/)，或從上方連結逐張查看完整圖。
 
 ---
 
